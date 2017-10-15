@@ -1,0 +1,24 @@
+{
+  "name": "insta_pic_upload",
+  "version": "1.0.0",
+  "description": "",
+  "main": "auto-manager.js",
+  "dependencies": {
+    "async": "^2.5.0",
+    "instagram-private-api": "^0.6.7"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andrebsampaio/instagram-auto-manager.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/andrebsampaio/instagram-auto-manager/issues"
+  },
+  "homepage": "https://github.com/andrebsampaio/instagram-auto-manager#readme"
+}
