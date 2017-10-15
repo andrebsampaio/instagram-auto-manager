@@ -9,7 +9,6 @@ var instaLocalDB = JSON.parse(fs.readFileSync(dbPath, 'utf8'))[0];
 
 var api = new InstagramAPI('zixam1805', 'password123456789', __dirname + '/cookies/');
 
-
 var download = function(uri, filename, callback) {
     request.head(uri, function(err, res, body) {
         request(uri).pipe(fs.createWriteStream(filename)).on('close', callback(filename));
@@ -55,7 +54,7 @@ var uploadImageFromUser = function(username, caption, callback) {
 }
 
 async.eachSeries(instaLocalDB.photography, function iteratee(item, callback) {
-    uploadImageFromUser(item.username, "Photo by: @" + item.username, function(imagePath, result) {
+    uploadImageFromUser(item.username, "Photo by: " + item.username, function(imagePath, result) {
         deleteFile(imagePath);
         callback(null);
     }).catch(function(e) {
