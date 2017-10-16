@@ -49,10 +49,13 @@ module.exports = class InstagramAPI {
                 return feed.get().then(function(results) {
                     // result should be Media[][]
                     var media = _.flatten(results);
-                    var urls = _.map(media, function(medium) {
-                        return _.first(medium.params.images).url;
+                    var images = _.map(media, function(medium) {
+                        return {
+                            timestamp : medium.params.deviceTimestamp,
+                            url : _.first(medium.params.images).url
+                        }
                     });
-                    return urls;
+                    return images;
                 });
             });
     }
