@@ -2,6 +2,7 @@ var Client = require('instagram-private-api').V1;
 var _ = require('lodash');
 var Promise = require('bluebird');
 var fs = require('fs');
+var request = require('request-promise');
 
 module.exports = class InstagramAPI {
 
@@ -34,6 +35,17 @@ module.exports = class InstagramAPI {
     findAccount(username) {
         return this.getSession().then(function(session) {
             return Client.Account.searchForUser(session, username)
+        });
+    }
+
+    getHashtagsForWord(word){
+        var url = "https://seekmetrics.com/api/hashtag-generator/" + word;
+        return request(url).then(function(body){
+            var jsonObject = JSON.parse(body);
+            var hashtags = _.map(jsonObject, function(hashtag){
+                return "#" + hashtag.name
+            });
+            return hashtags;
         });
     }
 
