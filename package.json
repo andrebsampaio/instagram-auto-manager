@@ -6,7 +6,8 @@
   "dependencies": {
     "async": "^2.5.0",
     "instagram-private-api": "^0.6.7",
-    "request-promise": "^4.2.2"
+    "request-promise": "^4.2.2",
+    "simple-node-logger": "^0.93.30"
   },
   "devDependencies": {},
   "scripts": {

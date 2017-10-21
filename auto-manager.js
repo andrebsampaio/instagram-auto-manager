@@ -1,7 +1,13 @@
-var args = process.argv.slice(2);
 var InstagramAPI = require('./instagram-api');
 var async = require('async');
 var IOUtils = require('./io-util');
+const SimpleNodeLogger = require('simple-node-logger'),
+opts = {
+    logFilePath:'mylogfile.log',
+    timestampFormat:'YYYY-MM-DD HH:mm:ss.SSS'
+},
+log = SimpleNodeLogger.createSimpleLogger( opts );
+var args = process.argv.slice(2);
 var imgExtension = '.jpg';
 var imgFolder = './tmp/';
 var dbPath = 'instagrammers-db';
@@ -24,12 +30,13 @@ var getValidURI = function(urls, oldAs) {
 }
 
 var uploadImageFromUser = function(username, caption, oldAs, callback) {
-    console.log("Now uploading " + username);
+    log.info("Checking " + username + " feed");
     return api.getImagesFromUser(username)
         .then(function(urls) {
             IOUtils.makeDir(imgFolder);
             IOUtils.download(getValidURI(urls, oldAs), imgFolder + username + imgExtension, function(filename) {
                 return function() {
+                    log.info("Now uploading " + username);
                     api.uploadImage(filename, caption, callback);
                 }
             });
@@ -44,7 +51,7 @@ var runInstagrammersDBUpload = function (topic){
                 IOUtils.deleteFile(imagePath);
                 callback(null);
             }).catch(function(e) {
-                console.log(e.message);
+                log.info(e.message);
                 callback(null);
             });
         });
