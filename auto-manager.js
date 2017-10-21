@@ -12,7 +12,7 @@ var imgExtension = '.jpg';
 var imgFolder = './tmp/';
 var dbPath = 'instagrammers-db';
 var instaLocalDB = IOUtils.readJSONfromFile(dbPath);
-var ONE_DAY = 86400000;
+var ONE_DAY = 86400;
 
 var api = new InstagramAPI('zixam1805', 'password123456789', __dirname + '/cookies/');
 
@@ -20,9 +20,9 @@ var getValidURI = function(urls, oldAs) {
     if (urls === undefined || !urls.length) {
         throw new Error('URLs is empty');
     }
-    var now = new Date().getTime()
+    var nowInSeconds = new Date().getTime()/1000
     for (url of urls) {
-        if (url.url !== undefined && now - url.timestamp  < oldAs) {
+        if (url.url !== undefined && nowInSeconds - url.timestamp  < oldAs) {
             return url.url;
         }
     }
