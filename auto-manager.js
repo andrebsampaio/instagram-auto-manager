@@ -1,3 +1,4 @@
+var args = process.argv.slice(2);
 var InstagramAPI = require('./instagram-api');
 var async = require('async');
 var IOUtils = require('./io-util');
@@ -5,7 +6,7 @@ var imgExtension = '.jpg';
 var imgFolder = './tmp/';
 var dbPath = 'instagrammers-db';
 var instaLocalDB = IOUtils.readJSONfromFile(dbPath);
-var ONE_DAY = 86400;
+var ONE_DAY = 86400000;
 
 var api = new InstagramAPI('zixam1805', 'password123456789', __dirname + '/cookies/');
 
@@ -13,9 +14,9 @@ var getValidURI = function(urls, oldAs) {
     if (urls === undefined || !urls.length) {
         throw new Error('URLs is empty');
     }
-    var nowInSeconds = new Date().getTime()/1000
+    var now = new Date().getTime()
     for (url of urls) {
-        if (url.url !== undefined && nowInSeconds - url.timestamp  < oldAs) {
+        if (url.url !== undefined && now - url.timestamp  < oldAs) {
             return url.url;
         }
     }
@@ -50,4 +51,4 @@ var runInstagrammersDBUpload = function (topic){
     });
 }
 
-runInstagrammersDBUpload('photography');
+runInstagrammersDBUpload(args);
