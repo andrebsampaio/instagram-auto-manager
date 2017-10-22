@@ -7,14 +7,14 @@ opts = {
     timestampFormat:'YYYY-MM-DD HH:mm:ss.SSS'
 },
 log = SimpleNodeLogger.createSimpleLogger( opts );
-var args = process.argv.slice(2);
+var argv = require('minimist')(process.argv.slice(2));
 var imgExtension = '.jpg';
 var imgFolder = './tmp/';
 var dbPath = 'instagrammers-db';
 var instaLocalDB = IOUtils.readJSONfromFile(dbPath);
 var ONE_DAY = 86400;
 
-var api = new InstagramAPI('zixam1805', 'password123456789', __dirname + '/cookies/');
+var api = new InstagramAPI(argv.u, argv.p, __dirname + '/cookies/');
 
 var getValidURI = function(urls, oldAs) {
     if (urls === undefined || !urls.length) {
@@ -64,4 +64,4 @@ var runInstagrammersDBUpload = function (topic){
     });
 }
 
-runInstagrammersDBUpload(args);
+runInstagrammersDBUpload(argv.t);
