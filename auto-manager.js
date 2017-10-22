@@ -47,17 +47,19 @@ var uploadImageFromUser = function(username, caption, oldAs, callback) {
         });
 }
 
+var hashtags = "#photography #love #instagood #follow #followme #followback #instafollow #photo #photos #pic #pics #picture #pictures #snapshot #art #beautiful #follow4follow #instagood #picoftheday #photooftheday #color #all_shots #exposure #composition #focus #capture #moment"
+
 var runInstagrammersDBUpload = function (topic){
     async.eachSeries(instaLocalDB[topic], function iteratee(item, callback) {
-        api.getHashtagsForWord(topic).then(function(hashtags){
-            var formattedCaption = "Photo by: " + item.username + "\n" + hashtags.join(" ");
-            uploadImageFromUser(item.username, formattedCaption, ONE_DAY, function(imagePath, result) {
-                IOUtils.deleteFile(imagePath);
-                callback(null);
-            }).catch(function(e) {
-                log.info(e.message);
-                callback(null);
-            });
+        var formattedCaption = "Photo by: " + item.username + "\n" + hashtags;
+        uploadImageFromUser(item.username, formattedCaption, ONE_DAY, function(imagePath, result) {
+            IOUtils.deleteFile(imagePath);
+            callback(null);
+        }).catch(function(e) {
+            log.info(e.message);
+            callback(null);
+        });api.getHashtagsForWord(topic).then(function(hashtags){
+            
         });
     });
 }
