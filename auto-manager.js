@@ -20,9 +20,13 @@ var getValidURI = function(urls, oldAs) {
     if (urls === undefined || !urls.length) {
         throw new Error('URLs is empty');
     }
-    var nowInSeconds = new Date().getTime()/1000
+    var nowInSeconds = new Date().getTime()/1000;
     for (url of urls) {
-        if (url.url !== undefined && nowInSeconds - url.timestamp  < oldAs) {
+        var urlTimestampInSeconds = url.timestamp;
+        if (url.timestamp.toString().length > 10){
+            urlTimestampInSeconds = url.timestamp/1000;
+        }
+        if (url.url !== undefined && nowInSeconds - urlTimestampInSeconds  < oldAs) {
             return url.url;
         }
     }
