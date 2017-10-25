@@ -20,6 +20,12 @@ module.exports = class InstagramAPI {
         return Client.Session.create(this.device, this.storage, this.clientName, this.password);
     }
 
+    likeImage(mediaId){
+        return this.getSession().then(function(session){
+            Client.Like.create(session, mediaId);
+        });
+    }
+
     uploadImage(imagePath, imageCaption, callback) {
         this.getSession().then(function(session) {
             Client.Upload.photo(session, imagePath)
@@ -47,6 +53,22 @@ module.exports = class InstagramAPI {
             });
             return hashtags;
         });
+    }
+    
+    getImagesByHashtag(hashtag, pageSize){
+        return this.getSession()
+            .then(function(session){
+                var tagged = new Client.Feed.TaggedMedia(session,hashtag,pageSize);
+                return tagged.get().then(function(results){
+                    // result should be Media[][]
+                    var media = _.flatten(results);
+                    var ids = _.map(media, function(medium) {
+                        return medium.id
+                    });
+                    return ids;
+                });    
+            })
+           
     }
 
     getImagesFromUser(username) {

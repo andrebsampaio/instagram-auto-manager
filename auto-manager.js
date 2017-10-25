@@ -58,10 +58,23 @@ var runInstagrammersDBUpload = function (topic){
         }).catch(function(e) {
             log.info(e.message);
             callback(null);
-        });api.getHashtagsForWord(topic).then(function(hashtags){
-            
         });
     });
 }
 
+var runAutoLike = function(pageSize, interval){
+    var hashtagsSplit = hashtags.split(" ");
+    var hashtag = hashtagsSplit[Math.floor(Math.random() * hashtagsSplit.length)].substr(1);
+    api.getImagesByHashtag(hashtag,pageSize)
+        .then(function(ids){
+            async.eachSeries(ids.slice(0,pageSize), function iteratee(item,callback){
+                setTimeout(function(){
+                    api.likeImage(item);
+                    callback(null);
+                },interval)
+            });
+        });
+}
+
 runInstagrammersDBUpload(argv.t);
+//runAutoLike(2,30000);
