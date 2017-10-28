@@ -65,6 +65,7 @@ var runInstagrammersDBUpload = function (topic){
 var runAutoLike = function(pageSize, interval){
     var hashtagsSplit = hashtags.split(" ");
     var hashtag = hashtagsSplit[Math.floor(Math.random() * hashtagsSplit.length)].substr(1);
+    log.info("Liking hashtag " + hashtag);
     api.getImagesByHashtag(hashtag,pageSize)
         .then(function(ids){
             async.eachSeries(ids.slice(0,pageSize), function iteratee(item,callback){
@@ -76,5 +77,13 @@ var runAutoLike = function(pageSize, interval){
         });
 }
 
-runInstagrammersDBUpload(argv.t);
-//runAutoLike(2,30000);
+if (argv.upload){
+    runInstagrammersDBUpload(argv.t);
+} else if (argv.like){
+    runAutoLike(argv.n,argv.i);
+} else {
+    console.log("Choose an action");
+}
+
+
+
