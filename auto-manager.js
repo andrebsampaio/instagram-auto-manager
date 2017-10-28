@@ -70,6 +70,7 @@ var runAutoLike = function(pageSize, interval){
         .then(function(ids){
             async.eachSeries(ids.slice(0,pageSize), function iteratee(item,callback){
                 setTimeout(function(){
+                    log.info("Liking image with id " + item);
                     api.likeImage(item);
                     callback(null);
                 },interval)
