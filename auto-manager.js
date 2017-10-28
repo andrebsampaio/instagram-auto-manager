@@ -1,6 +1,7 @@
 var InstagramAPI = require('./instagram-api');
 var async = require('async');
 var IOUtils = require('./io-util');
+var captionAPI = require('./caption-api');
 const SimpleNodeLogger = require('simple-node-logger'),
 opts = {
     logFilePath:'mylogfile.log',
@@ -51,14 +52,16 @@ var hashtags = "#photography #love #instagood #follow #followme #followback #ins
 
 var runInstagrammersDBUpload = function (topic){
     async.eachSeries(instaLocalDB[topic], function iteratee(item, callback) {
-        var formattedCaption = "Photo by: " + item.username + "\n" + hashtags;
-        uploadImageFromUser(item.username, formattedCaption, ONE_DAY, function(imagePath, result) {
-            IOUtils.deleteFile(imagePath);
-            callback(null);
-        }).catch(function(e) {
-            log.info(e.message);
-            callback(null);
-        });
+        var quote = captionAPI.getQuote().then(function(quote){
+            var formattedCaption = '"' + quote + '"\n' + "Photo by: " + item.username + "\n" + hashtags;
+            uploadImageFromUser(item.username, formattedCaption, ONE_DAY, function(imagePath, result) {
+                IOUtils.deleteFile(imagePath);
+                callback(null);
+            }).catch(function(e) {
+                log.info(e.message);
+                callback(null);
+            });
+        })
     });
 }
 
