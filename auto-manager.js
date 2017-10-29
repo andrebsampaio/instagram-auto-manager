@@ -28,7 +28,7 @@ var getValidURI = function(urls, oldAs) {
             urlTimestampInSeconds = url.timestamp/1000;
         }
         if (url.url !== undefined && nowInSeconds - urlTimestampInSeconds  < oldAs) {
-            return url.url;
+            return url;
         }
     }
     throw new Error('No URLs satisfy');
@@ -39,7 +39,8 @@ var uploadImageFromUser = function(username, caption, oldAs, callback) {
     return api.getImagesFromUser(username)
         .then(function(urls) {
             IOUtils.makeDir(imgFolder);
-            IOUtils.download(getValidURI(urls, oldAs), imgFolder + username + imgExtension, function(filename) {
+            var selectedUri = getValidURI(urls, oldAs);
+            IOUtils.download(selectedUri.url, imgFolder + username + imgExtension, function(filename) {
                 return function() {
                     log.info("Now uploading " + username);
                     api.uploadImage(filename, caption, callback);
@@ -88,6 +89,5 @@ if (argv.upload){
 } else {
     console.log("Choose an action");
 }
-
 
 

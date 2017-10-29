@@ -85,6 +85,7 @@ module.exports = class InstagramAPI {
                     var media = _.flatten(results);
                     var images = _.map(media, function(medium) {
                         return {
+                            location : medium.params.location,
                             timestamp : medium.params.deviceTimestamp,
                             url : _.first(medium.params.images).url
                         }
