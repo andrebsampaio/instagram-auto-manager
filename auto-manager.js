@@ -11,9 +11,14 @@ log = SimpleNodeLogger.createSimpleLogger( opts );
 var argv = require('minimist')(process.argv.slice(2));
 var imgExtension = '.jpg';
 var imgFolder = './tmp/';
+var instaDao = require('./insta-dao-sqlite');
 var dbPath = 'instagrammers-db';
 var instaLocalDB = IOUtils.readJSONfromFile(dbPath);
+var MIN_INTERVAL = 8000;
 var ONE_DAY = 86400;
+var FIFTEEN_MINUTES = 900;
+var LIKE = "LIKE";
+var FOLLOW = "FOLLOW";
 
 var api = new InstagramAPI(argv.u, argv.p, __dirname + '/cookies/');
 
@@ -21,7 +26,7 @@ var getValidURI = function(urls, oldAs) {
     if (urls === undefined || !urls.length) {
         throw new Error('URLs is empty');
     }
-    var nowInSeconds = new Date().getTime()/1000;
+    var nowInSeconds = nowInSeconds();
     for (url of urls) {
         var urlTimestampInSeconds = url.timestamp;
         if (url.timestamp.toString().length > 10){
@@ -32,6 +37,14 @@ var getValidURI = function(urls, oldAs) {
         }
     }
     throw new Error('No URLs satisfy');
+}
+
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function nowInSeconds(){
+    return new Date().getTime()/1000;
 }
 
 var uploadImageFromUser = function(username, caption, oldAs, callback) {
@@ -68,28 +81,58 @@ var runInstagrammersDBUpload = function (topic){
     });
 }
 
-var runAutoLike = function(pageSize, interval){
+var runAutoAction = function(pageSize, interval, action){
     var hashtagsSplit = hashtags.split(" ");
     var hashtag = hashtagsSplit[Math.floor(Math.random() * hashtagsSplit.length)].substr(1);
-    log.info("Liking hashtag " + hashtag);
+    log.info(action + " hashtag " + hashtag);
     api.getImagesByHashtag(hashtag,pageSize)
-        .then(function(ids){
-            async.eachSeries(ids.slice(0,pageSize), function iteratee(item,callback){
+        .then(function(images){
+            async.eachSeries(images.slice(0,pageSize), function iteratee(item,callback){
                 setTimeout(function(){
-                    log.info("Liking image with id " + item);
-                    api.likeImage(item);
+                    var id;
+                    switch(action){
+                        case LIKE:
+                            api.likeImage(item.id);
+                            id = item.id;
+                            break;
+                        case FOLLOW:
+                            api.followUser(item.account.id);
+                            instaDao.saveFollowers([{
+                                accountId: item.account.id,
+                                hashtag: hashtag
+                            }]);
+                            id = item.account.id;
+                            break;
+                        default:
+                            console.log("Unrecognized Action");
+                            return;
+                    }
+                    log.info(action + " with id " + id);
                     callback(null);
-                },interval)
+                },getRandomInt(MIN_INTERVAL,interval))
             });
         });
+}
+
+if (!argv.i){
+    argv.i = 12000;
+} else if (!argv.n){
+    argv.n = 5;
+} else if (!argv.d) {
+    argv.d = 2;
 }
 
 if (argv.upload){
     runInstagrammersDBUpload(argv.t);
 } else if (argv.like){
-    runAutoLike(argv.n,argv.i);
+    runAutoAction(argv.n,argv.i, LIKE);
+} else if (argv.follow){
+    runAutoAction(argv.n,argv.i, FOLLOW);    
+} else if (argv.unfollow){
+    var start = nowInSeconds - (ONE_DAY + FIFTEEN_MINUTES) * argv.d;
+    var end = nowInSeconds - ONE_DAY * (argv.d - 1);
+    instaDao.removeFollowersWithTimeInterval(start, end);
 } else {
     console.log("Choose an action");
 }
-
 

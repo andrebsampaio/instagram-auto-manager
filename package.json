@@ -8,7 +8,8 @@
     "instagram-private-api": "^0.6.7",
     "minimist": "^1.2.0",
     "request-promise": "^4.2.2",
-    "simple-node-logger": "^0.93.30"
+    "simple-node-logger": "^0.93.30",
+    "sqlite3": "^3.1.13"
   },
   "devDependencies": {},
   "scripts": {

@@ -26,6 +26,18 @@ module.exports = class InstagramAPI {
         });
     }
 
+    followUser(accountId){
+        return this.getSession().then(function(session){
+            Client.Relationship.create(session,accountId);   
+        });
+    }
+
+    unfollowUser(accountId){
+        return this.getSession().then(function(session){
+            Client.Relationship.destroy(session,accountId);   
+        });
+    }
+
     uploadImage(imagePath, imageCaption, callback) {
         this.getSession().then(function(session) {
             Client.Upload.photo(session, imagePath)
@@ -62,10 +74,10 @@ module.exports = class InstagramAPI {
                 return tagged.get().then(function(results){
                     // result should be Media[][]
                     var media = _.flatten(results);
-                    var ids = _.map(media, function(medium) {
-                        return medium.id
+                    var images = _.map(media, function(medium) {
+                        return medium
                     });
-                    return ids;
+                    return images;
                 });    
             })
            
