@@ -87,6 +87,7 @@ var runAutoAction = function(pageSize, interval, action){
     log.info(action + " hashtag " + hashtag);
     api.getImagesByHashtag(hashtag,pageSize)
         .then(function(images){
+            var addToDB = [];
             async.eachSeries(images.slice(0,pageSize), function iteratee(item,callback){
                 setTimeout(function(){
                     var id;
@@ -97,10 +98,10 @@ var runAutoAction = function(pageSize, interval, action){
                             break;
                         case FOLLOW:
                             api.followUser(item.account.id);
-                            instaDao.saveFollowers([{
+                            addToDB.push({
                                 accountId: item.account.id,
                                 hashtag: hashtag
-                            }]);
+                            });
                             id = item.account.id;
                             break;
                         default:
@@ -108,8 +109,13 @@ var runAutoAction = function(pageSize, interval, action){
                             return;
                     }
                     log.info(action + " with id " + id);
+                    
                     callback(null);
                 },getRandomInt(MIN_INTERVAL,interval))
+            }, function(err,result){
+                if (action == FOLLOW){
+                    instaDao.saveFollowers(addToDB);
+                }
             });
         });
 }

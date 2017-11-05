@@ -20,12 +20,15 @@ module.exports = {
       }
       console.log(`Followers between ${start} and ${realEnd} removed`);
     });
+
+    db.close();
   },
 
   saveFollowers: function(accountIdsWithHashtag){
-    var query = 'INSERT INTO follower(created, account_id, hashtag) ';
+    var query = 'INSERT INTO follower(created, account_id, hashtag) VALUES';
     accountIdsWithHashtag.forEach(function(item,index){
-      query += `VALUES (strftime('%s','now'), ${item.accountId},"${item.hashtag}")`;
+      var separator = index != accountIdsWithHashtag.length - 1 ? "," : "";
+      query += ` (strftime('%s','now'), ${item.accountId},"${item.hashtag}")${separator}`;
     });
 
     db.run(query,[], function(err) {
