@@ -3,40 +3,45 @@ var db = new sqlite3.Database('./database/insta-auto', (err) => {
     if (err) {
       console.error(err.message);
     }
-    console.log('Connected to the database.');
 });
 
-module.exports = {
-  getInstagrammersByTopic: function(topic){
-    //TODO
-  },
+module.exports = class InstaDaoSqlite {
 
-  removeFollowersWithTimeInterval: function(start, end){
+  constructor(log){
+    this.log = log;
+  }
+
+  getInstagrammersByTopic(topic){
+    //TODO
+  }
+
+  removeFollowersWithTimeInterval(start, end){
     var realEnd = end ? end : "strftime('%s','now')";
-    var query = `DELETE FROM follower WHERE ${start} - created > 0 AND created - ${realEnd} < 0` 
+    var query = `DELETE FROM follower WHERE ${start} - created > 0 AND created - ${realEnd} < 0`
+    var logger = this.log;
     db.run(query,[], function(err){
       if (err) {
-        return console.log(err.message);
+        return logger.info(err.message);
       }
-      console.log(`Followers between ${start} and ${realEnd} removed`);
+      logger.info(`Followers between ${start} and ${realEnd} removed`);
     });
-
     db.close();
-  },
+  }
 
-  saveFollowers: function(accountIdsWithHashtag){
+  saveFollowers(accountIdsWithHashtag){
     var query = 'INSERT INTO follower(created, account_id, hashtag) VALUES';
     accountIdsWithHashtag.forEach(function(item,index){
       var separator = index != accountIdsWithHashtag.length - 1 ? "," : "";
       query += ` (strftime('%s','now'), ${item.accountId},"${item.hashtag}")${separator}`;
     });
 
+    var logger = this.log;
     db.run(query,[], function(err) {
     if (err) {
-      return console.log(err.message);
+      return logger.info(err.message);
     }
 
-    console.log(`Followers saved to db`);
+    logger.info(`Saved ${accountIdsWithHashtag.length} followers`);
   });
  
   db.close();

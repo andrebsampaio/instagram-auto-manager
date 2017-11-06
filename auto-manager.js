@@ -11,7 +11,7 @@ log = SimpleNodeLogger.createSimpleLogger( opts );
 var argv = require('minimist')(process.argv.slice(2));
 var imgExtension = '.jpg';
 var imgFolder = './tmp/';
-var instaDao = require('./insta-dao-sqlite');
+var InstaDaoSqlite = require('./insta-dao-sqlite');
 var dbPath = 'instagrammers-db';
 var instaLocalDB = IOUtils.readJSONfromFile(dbPath);
 var MIN_INTERVAL = 8000;
@@ -21,6 +21,7 @@ var LIKE = "LIKE";
 var FOLLOW = "FOLLOW";
 
 var api = new InstagramAPI(argv.u, argv.p, __dirname + '/cookies/');
+var instaDao = new InstaDaoSqlite(log);
 
 var getValidURI = function(urls, oldAs) {
     if (urls === undefined || !urls.length) {
@@ -105,7 +106,7 @@ var runAutoAction = function(pageSize, interval, action){
                             id = item.account.id;
                             break;
                         default:
-                            console.log("Unrecognized Action");
+                            log.info("Unrecognized Action");
                             return;
                     }
                     log.info(action + " with id " + id);
@@ -139,6 +140,6 @@ if (argv.upload){
     var end = nowInSeconds - ONE_DAY * (argv.d - 1);
     instaDao.removeFollowersWithTimeInterval(start, end);
 } else {
-    console.log("Choose an action");
+    log.info("Choose an action");
 }
 
