@@ -17,7 +17,10 @@ module.exports = class InstaDaoSqlite {
 
   getFollowersWithTimeInterval(start,end,callback){
     var realEnd = end ? end : "strftime('%s','now')";
-    var query = `SELECT * FROM follower WHERE ${start} - created > 0 AND created - ${realEnd} < 0`;
+    var query = `SELECT * 
+    FROM follower 
+    WHERE  created > ${start} AND ${realEnd} > created 
+    ORDER BY created ASC`;
     var logger = this.log;
     db.each(query,[], (err, result) => {
       if (err) {
@@ -27,8 +30,6 @@ module.exports = class InstaDaoSqlite {
       callback(result);
 
    });
-
-   db.close();
   }
 
   removeFollower(accountId){

@@ -19,7 +19,7 @@ var ONE_DAY = 86400;
 var LIKE = "LIKE";
 var FOLLOW = "FOLLOW";
 
-//var api = new InstagramAPI(argv.u, argv.p, __dirname + '/cookies/');
+var api = new InstagramAPI(argv.u, argv.p, __dirname + '/cookies/');
 var instaDao = new InstaDaoSqlite(log);
 
 var getValidURI = function(urls, oldAs) {
@@ -122,14 +122,16 @@ var runAutoAction = function(pageSize, interval, action){
 
 var unfollowAction = function(){
     var start = nowInSeconds() - (ONE_DAY) * argv.d;
-    var end = nowInSeconds() - ONE_DAY * (argv.d - 1);
+    var end = nowInSeconds()
+    var count = 0;
     instaDao.getFollowersWithTimeInterval(start,end,function(follower){
+        if(count == argv.n) return;
         setTimeout(function(){
             api.unfollowUser(follower.account_id).then(function(result){
                 instaDao.removeFollower(follower.account_id);
             });
         },getRandomInt(MIN_INTERVAL,argv.i));
-        
+        count++;        
     });
 }
 
