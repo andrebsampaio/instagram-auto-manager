@@ -120,6 +120,19 @@ var runAutoAction = function(pageSize, interval, action){
         });
 }
 
+var unfollowAction = function(){
+    var start = nowInSeconds() - (ONE_DAY) * argv.d;
+    var end = nowInSeconds() - ONE_DAY * (argv.d - 1);
+    instaDao.getFollowersWithTimeInterval(start,end,function(follower){
+        setTimeout(function(){
+            api.unfollowUser(follower.account_id).then(function(result){
+                instaDao.removeFollower(follower.account_id);
+            });
+        },getRandomInt(MIN_INTERVAL,argv.i));
+        
+    });
+}
+
 if (!argv.i){
     argv.i = 12000;
 } else if (!argv.n){
@@ -135,16 +148,7 @@ if (argv.upload){
 } else if (argv.follow){
     runAutoAction(argv.n,argv.i, FOLLOW);    
 } else if (argv.unfollow){
-    var start = nowInSeconds() - (ONE_DAY) * argv.d;
-    var end = nowInSeconds() - ONE_DAY * (argv.d - 1);
-    instaDao.getFollowersWithTimeInterval(start,end,function(follower){
-        setTimeout(function(){
-            api.unfollowUser(follower.account_id).then(function(result){
-                instaDao.removeFollower(follower.account_id);
-            });
-        },getRandomInt(MIN_INTERVAL,argv.i));
-        
-    });
+    unfollowAction();
 } else {
     log.info("Choose an action");
 }
