@@ -15,17 +15,31 @@ module.exports = class InstaDaoSqlite {
     //TODO
   }
 
-  removeFollowersWithTimeInterval(start, end){
+  getFollowersWithTimeInterval(start,end,callback){
     var realEnd = end ? end : "strftime('%s','now')";
-    var query = `DELETE FROM follower WHERE ${start} - created > 0 AND created - ${realEnd} < 0`
+    var query = `SELECT * FROM follower WHERE ${start} - created > 0 AND created - ${realEnd} < 0`;
     var logger = this.log;
+    db.each(query,[], (err, result) => {
+      if (err) {
+        return logger.info(err.message);
+      }
+
+      callback(result);
+
+   });
+
+   db.close();
+  }
+
+  removeFollower(accountId){
+    var query = `DELETE FROM follower WHERE account_id = "${accountId}"`
+    var logger = this.log;  
     db.run(query,[], function(err){
       if (err) {
         return logger.info(err.message);
       }
-      logger.info(`Followers between ${start} and ${realEnd} removed`);
+      logger.info(`Removed follower with Id ${accountId}`);
     });
-    db.close();
   }
 
   saveFollowers(accountIdsWithHashtag){

@@ -20,7 +20,7 @@ var LAG_INTERVAL = 300;
 var LIKE = "LIKE";
 var FOLLOW = "FOLLOW";
 
-var api = new InstagramAPI(argv.u, argv.p, __dirname + '/cookies/');
+//var api = new InstagramAPI(argv.u, argv.p, __dirname + '/cookies/');
 var instaDao = new InstaDaoSqlite(log);
 
 var getValidURI = function(urls, oldAs) {
@@ -136,10 +136,16 @@ if (argv.upload){
 } else if (argv.follow){
     runAutoAction(argv.n,argv.i, FOLLOW);    
 } else if (argv.unfollow){
-    var start = nowInSeconds - (ONE_DAY + LAG_INTERVAL) * argv.d;
-    var end = nowInSeconds - ONE_DAY * (argv.d - 1);
-    instaDao.removeFollowersWithTimeInterval(start, end);
+    var start = nowInSeconds() - (ONE_DAY + LAG_INTERVAL) * argv.d;
+    var end = nowInSeconds() - ONE_DAY * (argv.d - 1);
+    instaDao.getFollowersWithTimeInterval(start,end,function(follower){
+        setTimeout(function(){
+            api.unfollowUser(follower.account_id).then(function(result){
+                instaDao.removeFollower(follower.account_id);
+            });
+        },getRandomInt(MIN_INTERVAL,argv.i));
+        
+    });
 } else {
     log.info("Choose an action");
 }
-
