@@ -16,7 +16,6 @@ var dbPath = 'instagrammers-db';
 var instaLocalDB = IOUtils.readJSONfromFile(dbPath);
 var MIN_INTERVAL = 8000;
 var ONE_DAY = 86400;
-var LAG_INTERVAL = 300;
 var LIKE = "LIKE";
 var FOLLOW = "FOLLOW";
 
@@ -136,7 +135,7 @@ if (argv.upload){
 } else if (argv.follow){
     runAutoAction(argv.n,argv.i, FOLLOW);    
 } else if (argv.unfollow){
-    var start = nowInSeconds() - (ONE_DAY + LAG_INTERVAL) * argv.d;
+    var start = nowInSeconds() - (ONE_DAY) * argv.d;
     var end = nowInSeconds() - ONE_DAY * (argv.d - 1);
     instaDao.getFollowersWithTimeInterval(start,end,function(follower){
         setTimeout(function(){
