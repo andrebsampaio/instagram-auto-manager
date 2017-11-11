@@ -26,13 +26,12 @@ var getValidURI = function(urls, oldAs) {
     if (urls === undefined || !urls.length) {
         throw new Error('URLs is empty');
     }
-    var nowInSeconds = nowInSeconds();
     for (url of urls) {
         var urlTimestampInSeconds = url.timestamp;
         if (url.timestamp.toString().length > 10){
             urlTimestampInSeconds = url.timestamp/1000;
         }
-        if (url.url !== undefined && nowInSeconds - urlTimestampInSeconds  < oldAs) {
+        if (url.url !== undefined && nowInSeconds() - urlTimestampInSeconds  < oldAs) {
             return url;
         }
     }
