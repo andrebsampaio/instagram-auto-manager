@@ -43,6 +43,20 @@ module.exports = class InstaDaoSqlite {
     });
   }
 
+  saveFollowerCount(count){
+    var query = `INSERT INTO follower_status(created,count) VALUES (strftime('%s','now'), ${count})`;
+    var logger = this.log;
+    db.run(query,[],function(err){
+      if (err) {
+        return logger.info(err.message);
+      }
+  
+      logger.info(`Registered ${count} followers`);
+    });
+
+    db.close();
+  }
+
   saveFollowers(accountIdsWithHashtag){
     var query = 'INSERT INTO follower(created, account_id, hashtag) VALUES';
     accountIdsWithHashtag.forEach(function(item,index){

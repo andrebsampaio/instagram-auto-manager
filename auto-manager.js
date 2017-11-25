@@ -2,6 +2,8 @@ var InstagramAPI = require('./instagram-api');
 var async = require('async');
 var IOUtils = require('./io-util');
 var captionAPI = require('./caption-api');
+var emailUtil = require('./email-util');
+var InstaDaoSqlite = require('./insta-dao-sqlite');
 const SimpleNodeLogger = require('simple-node-logger'),
 opts = {
     logFilePath:'mylogfile.log',
@@ -11,7 +13,6 @@ log = SimpleNodeLogger.createSimpleLogger( opts );
 var argv = require('minimist')(process.argv.slice(2));
 var imgExtension = '.jpg';
 var imgFolder = './tmp/';
-var InstaDaoSqlite = require('./insta-dao-sqlite');
 var dbPath = 'instagrammers-db';
 var instaLocalDB = IOUtils.readJSONfromFile(dbPath);
 var MIN_INTERVAL = 8000;
@@ -19,6 +20,7 @@ var ONE_DAY = 86400;
 var LIKE = "LIKE";
 var FOLLOW = "FOLLOW";
 
+var emailUtil = new emailUtil(log);
 var api = new InstagramAPI(argv.u, argv.p, __dirname + '/cookies/');
 var instaDao = new InstaDaoSqlite(log);
 
@@ -134,6 +136,17 @@ var unfollowAction = function(){
     });
 }
 
+var saveFollowerCount = function(){
+    api.findAccount(argv.u).then(function(result){
+        instaDao.saveFollowerCount(result.params.followerCount);
+    });
+}
+
+var checkFollowers = function(){
+    saveFollowerCount();
+
+}
+
 if (!argv.i){
     argv.i = 12000;
 } else if (!argv.n){
@@ -150,6 +163,9 @@ if (argv.upload){
     runAutoAction(argv.n,argv.i, FOLLOW);    
 } else if (argv.unfollow){
     unfollowAction();
-} else {
+} else if (argv.followerscheck) {
+    checkFollowers();
+}
+else {
     log.info("Choose an action");
 }

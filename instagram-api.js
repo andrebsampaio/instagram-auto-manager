@@ -83,6 +83,13 @@ module.exports = class InstagramAPI {
            
     }
 
+    getAccount(accountId){
+        return this.getSession()
+            .then(function(session){
+
+            });
+    }
+
     getImagesFromUser(username) {
         var api = this;
         return this.getSession()
