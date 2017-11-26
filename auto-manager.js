@@ -17,6 +17,7 @@ var dbPath = 'instagrammers-db';
 var instaLocalDB = IOUtils.readJSONfromFile(dbPath);
 var MIN_INTERVAL = 8000;
 var ONE_DAY = 86400;
+var ONE_HOUR = 3600;
 var LIKE = "LIKE";
 var FOLLOW = "FOLLOW";
 
@@ -136,15 +137,31 @@ var unfollowAction = function(){
     });
 }
 
-var saveFollowerCount = function(){
+var checkFollowers = function(expectedPerHour){
     api.findAccount(argv.u).then(function(result){
-        instaDao.saveFollowerCount(result.params.followerCount);
+        var currentCount = result.params.followerCount
+        instaDao.saveFollowerCount(currentCount);
+
+        instaDao.getFollowerCountWithInterval(nowInSeconds - argv.i, nowInSeconds(), function(err,row){
+            if (err) {
+                return log.info(err.message);
+            }
+
+            if (row){
+                if (currentCount <= row.count + expectedPerHour/2){
+                    emailUtil.sendEmail(`${argv.u} - There's a problem with FOLLOWING`,
+                        `Current Count: ${currentCount}\n 
+                        Last Count: ${row.count}`,
+                        process.env.DESTINATION_EMAIL, function(info){
+                            instaDao.closeDB();
+                        }
+                    );
+                }
+            }
+
+        });
+        
     });
-}
-
-var checkFollowers = function(){
-    saveFollowerCount();
-
 }
 
 if (!argv.i){
@@ -164,8 +181,8 @@ if (argv.upload){
 } else if (argv.unfollow){
     unfollowAction();
 } else if (argv.followerscheck) {
-    checkFollowers();
-}
-else {
+    checkFollowers(argv.e, argv.i);
+} else {
     log.info("Choose an action");
 }
+

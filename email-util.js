@@ -13,7 +13,7 @@ module.exports = class emailUtil {
         this.log = log;
     }
 
-    sendEmail(subject, text, destinationEmail){
+    sendEmail(subject, text, destinationEmail, callback){
         var logger = this.log;
         var mailOptions = {
             from: process.env.EMAIL,
@@ -27,6 +27,7 @@ module.exports = class emailUtil {
               logger.error(error);
             } else {
               logger.info('Email sent: ' + info.response);
+              callback(info);
             }
         });
     }

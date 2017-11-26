@@ -57,6 +57,17 @@ module.exports = class InstaDaoSqlite {
     db.close();
   }
 
+  getFollowerCountWithInterval(start,end, callback) {
+    var query = `SELECT * 
+    FROM follower_status 
+    WHERE  created > ${start} AND ${end} > created 
+    ORDER BY created DESC`;
+
+    var logger = this.log;
+
+    db.get(query, [], callback);
+  }
+
   saveFollowers(accountIdsWithHashtag){
     var query = 'INSERT INTO follower(created, account_id, hashtag) VALUES';
     accountIdsWithHashtag.forEach(function(item,index){
@@ -73,6 +84,9 @@ module.exports = class InstaDaoSqlite {
     logger.info(`Saved ${accountIdsWithHashtag.length} followers`);
   });
  
-  db.close();
+  }
+
+  closeDB(){
+    db.close();
   }
 }
