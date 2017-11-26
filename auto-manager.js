@@ -142,7 +142,7 @@ var checkFollowers = function(expectedPerHour){
         var currentCount = result.params.followerCount
         instaDao.saveFollowerCount(currentCount);
 
-        instaDao.getFollowerCountWithInterval(nowInSeconds - argv.i, nowInSeconds(), function(err,row){
+        instaDao.getFollowerCountWithInterval(nowInSeconds - argv.i * 60, nowInSeconds(), function(err,row){
             if (err) {
                 return log.info(err.message);
             }
