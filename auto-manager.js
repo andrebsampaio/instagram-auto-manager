@@ -125,14 +125,14 @@ var runAutoAction = function(pageSize, interval, action){
 var unfollowAction = function(){
     var start = nowInSeconds() - (ONE_DAY) * argv.d;
     var end = nowInSeconds()
-    var count = 0;
+    var count = 1;
     instaDao.getFollowersWithTimeInterval(start,end,function(follower){
-        if(count == argv.n) return;
+        if(count - 1 == argv.n) return;
         setTimeout(function(){
             api.unfollowUser(follower.account_id).then(function(result){
                 instaDao.removeFollower(follower.account_id);
             });
-        },getRandomInt(MIN_INTERVAL,argv.i));
+        },getRandomInt(MIN_INTERVAL * count,argv.i));
         count++;        
     });
 }
