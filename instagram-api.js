@@ -83,10 +83,18 @@ module.exports = class InstagramAPI {
            
     }
 
-    getAccount(accountId){
+    getFollowing(username){
+        var api = this;
         return this.getSession()
-            .then(function(session){
+            .then(function(session) {
+                return [session, api.findAccount(username)];
+            })
+            .spread(function(session, account) {
+                var feed = new Client.Feed.AccountFollowing(session, account.id);
 
+                return feed.get().then(function(results) {
+                    return results;
+                });
             });
     }
 

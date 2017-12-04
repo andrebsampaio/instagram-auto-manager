@@ -138,8 +138,8 @@ var unfollowAction = function(){
 }
 
 var checkFollowers = function(expectedPerHour){
-    api.findAccount(argv.u).then(function(result){
-        var currentCount = result.params.followerCount
+    api.getFollowing(argv.u).then(function(result){
+        var currentCount = result.length;
         instaDao.saveFollowerCount(currentCount);
 
         instaDao.getFollowerCountWithInterval(nowInSeconds - argv.i * 60, nowInSeconds(), function(err,row){
