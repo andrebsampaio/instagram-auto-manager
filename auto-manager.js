@@ -148,7 +148,9 @@ var checkFollowers = function(expectedPerHour){
             }
 
             if (row){
-                if (currentCount <= row.count + expectedPerHour/2){
+                var nextCount = row.count + expectedPerHour/2;
+                var condition = expectedPerHour < 0 ? currentCount >= nextCount  : currentCount <= nextCount;
+                if (condition){
                     emailUtil.sendEmail(`${argv.u} - There's a problem with FOLLOWING`,
                         `Current Count: ${currentCount}\n 
                         Last Count: ${row.count}`,
